@@ -3,8 +3,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install yarn
-RUN npm install -g yarn
+# yarn already exists in node:20-alpine
 
 # Copy package files
 COPY package.json yarn.lock ./
