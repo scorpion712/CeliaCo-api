@@ -1,20 +1,19 @@
-# Production Dockerfile - Simplificado para Render.com
+# Production Dockerfile - Usando yarn y ts-node
 FROM node:20-alpine
 
 WORKDIR /app
 
+# Install yarn
+RUN npm install -g yarn
+
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json yarn.lock ./
 
 # Install production deps ignoring native scripts
-RUN npm install --ignore-scripts --legacy-peer-deps --omit=dev
+RUN yarn install --ignore-scripts --production
 
-# Copy source
-COPY tsconfig.json ./
-COPY src ./src
-
-# Build TypeScript
-RUN npx tsc
+# Copy all source
+COPY . .
 
 # Security: run as non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -28,5 +27,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# Start production server
-CMD ["node", "dist/index.js"]
+# Start with ts-node directly (no build needed)
+CMD ["npx", "ts-node", "src/index.ts"]
