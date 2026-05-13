@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: pos-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234root
+      MYSQL_DATABASE: db_businessName
+      MYSQL_USER: pos_user
+      MYSQL_PASSWORD: pos_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db_scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pos-network
+
+  # API Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pos-api
+    container_name: pos-api
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_TYPE: mysql
+      DATABASE_URL: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: db_businessName
+      DATABASE_USER: root
+      DATABASE_PASSWORD: 1234root
+      JWT_SECRET: business-name-jwt-key
+      JWT_ACCESS_EXPIRATION: 1h
+      JWT_REFRESH_SECRET: business-name-refresh-jwt-key
+      JWT_REFRESH_EXPIRATION: 1d
+      CUIT: 27375614060
+      PtoVta: 1
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./USB001:/app/USB001
+      - ./POS58:/app/POS58
+    networks:
+      - pos-network
+
+volumes:
+  mysql_data:
+
+networks:
+  pos-network:
+    driver: bridge

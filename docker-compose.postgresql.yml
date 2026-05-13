@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: celiapos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d celiapos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pos-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pos-api
+    container_name: pos-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_URL: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: celiapos
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      JWT_SECRET: business-name-jwt-key
+      JWT_ACCESS_EXPIRATION: 1h
+      JWT_REFRESH_SECRET: business-name-refresh-jwt-key
+      JWT_REFRESH_EXPIRATION: 1d
+      CUIT: 27375614060
+      PtoVta: 1
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./USB001:/app/USB001
+      - ./POS58:/app/POS58
+    networks:
+      - pos-network
+
+volumes:
+  postgres_data:
+
+networks:
+  pos-network:
+    driver: bridge
