@@ -4,7 +4,6 @@ export * from "./customers/Customers.service";
 export * from "./sales/Sales.service";
 export * from "./saleDetails/SaleDetails.service";
 export * from "./products/Product.service";
-export * from "./printer/Printer.service";
 export * from "./dashboard/Dashboard.service";
 export * from "./instances";
 export * from "./cuentas/CuentaCorriente.service";

@@ -2,7 +2,7 @@ export * from './ArcaController';
 export * from './AuthController';
 export * from './SalesController';
 export * from './ProductsController';
-export * from './PrinterController';
+// export * from './PrinterController';
 export * from './CuentasController';
 export * from './DashboardController';
 export * from './CashBoxController';
