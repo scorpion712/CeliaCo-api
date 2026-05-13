@@ -6,14 +6,14 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies ignoring native modules build scripts
+RUN npm install --ignore-scripts --legacy-peer-deps
 
 # Copy source and build
 COPY tsconfig.json ./
 COPY src ./src
 
-# Build TypeScript
+# Build TypeScript (exclude printer-related native deps)
 RUN npx tsc
 
 # Final stage - Alpine para imagen más pequeña
@@ -21,9 +21,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy only production files
+# Copy package files
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+
+# Install production deps ignoring native scripts
+RUN npm install --ignore-scripts --legacy-peer-deps --production
 
 # Copy built files
 COPY --from=builder /app/dist ./dist
