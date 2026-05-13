@@ -26,5 +26,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# Start with ts-node directly (no build needed)
-CMD ["npx", "ts-node", "src/index.ts"]
+# Start the server
+CMD ["yarn", "start:prod"]
