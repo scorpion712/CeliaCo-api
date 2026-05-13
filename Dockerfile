@@ -1,22 +1,4 @@
-# Production Dockerfile - Optimizado para Render.com
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package.json package-lock.json* ./
-
-# Install dependencies ignoring native modules build scripts
-RUN npm install --ignore-scripts --legacy-peer-deps
-
-# Copy source and build
-COPY tsconfig.json ./
-COPY src ./src
-
-# Build TypeScript (exclude printer-related native deps)
-RUN npx tsc
-
-# Final stage - Alpine para imagen más pequeña
+# Production Dockerfile - Simplificado para Render.com
 FROM node:20-alpine
 
 WORKDIR /app
@@ -25,14 +7,19 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install production deps ignoring native scripts
-RUN npm install --ignore-scripts --legacy-peer-deps --production
+RUN npm install --ignore-scripts --legacy-peer-deps --omit=dev
 
-# Copy built files
-COPY --from=builder /app/dist ./dist
+# Copy source
+COPY tsconfig.json ./
+COPY src ./src
+
+# Build TypeScript
+RUN npx tsc
 
 # Security: run as non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
 USER nodejs
 
 # Environment
