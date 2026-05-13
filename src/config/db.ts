@@ -11,15 +11,24 @@ let pool: any;
 if (databaseType === 'postgresql') {
   // PostgreSQL configuration
   const { Pool } = require('pg');
+
+  // Support both individual params and connection string
+  const connectionString = process.env.DATABASE_URL;
+
   const pgPool = new Pool({
-    host: process.env.DATABASE_URL,
-    port: parseInt(process.env.DATABASE_PORT ?? "5432"),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
+    ...(connectionString?.startsWith('postgresql://')
+      ? { connectionString }
+      : {
+          host: process.env.DATABASE_URL,
+          port: parseInt(process.env.DATABASE_PORT ?? "5432"),
+          user: process.env.DATABASE_USER,
+          password: process.env.DATABASE_PASSWORD,
+          database: process.env.DATABASE_NAME,
+        }),
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
+    ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
   });
 
   // Test connection
