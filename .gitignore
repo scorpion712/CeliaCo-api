@@ -41,3 +41,8 @@ POS58/
 USB001/
 patches/
 printer/
+
+# Development scripts and docs
+db_scripts/
+docs/
+scripts/
