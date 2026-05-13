@@ -1,0 +1,1 @@
+export * from './activateCustomer.handler';
