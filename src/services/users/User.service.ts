@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { pool } from '../../config/db';
 import { errors } from '../../errors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 

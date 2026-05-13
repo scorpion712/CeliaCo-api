@@ -60,7 +60,7 @@ app.use("/api/cash", CashRoutes);
 app.use(errorHandler);
 app.use(notFoundHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
 console.log(`Starting server on ${HOST}:${PORT}...`);

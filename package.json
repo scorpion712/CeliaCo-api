@@ -10,7 +10,7 @@
     "start:backend": "nodemon src/index.ts",
     "start:frontend": "cd ../POS-WEB && yarn dev",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
-    "start:prod": "ts-node --transpile-only src/index.ts",
+    "start:prod": "node dist/index.js",
     "dev": "nodemon src/index.ts"
   },
   "author": "Lautaro Diez",
