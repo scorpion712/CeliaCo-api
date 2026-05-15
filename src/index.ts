@@ -27,6 +27,11 @@ import CashRoutes from "./routes/caja/CashRoutes";
 
 const app = express();
 
+// ─── Trust Proxy ──────────────────────────────────────────────────
+// Render (y cualquier proxy) setea X-Forwarded-For.
+// Sin esto, express-rate-limit valida y explota.
+app.set('trust proxy', 1);
+
 // ─── Security Middleware ───────────────────────────────────────────
 // Apply in order: helmet → cors → rate limit → body parser → logger
 app.use(helmetMiddleware);
@@ -36,7 +41,11 @@ app.use(express.json());
 app.use(sanitizeBody); // Phase 2: XSS sanitization
 app.use(requestLoggerMiddleware);
 
-// ─── Health Check ────────────────────────────────────────────────
+// ─── Root & Health Check ─────────────────────────────────────────
+app.get("/", (_req, res) => {
+  res.redirect("/health");
+});
+
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
